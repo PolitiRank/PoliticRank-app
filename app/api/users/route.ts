@@ -45,12 +45,31 @@ export async function POST(request: Request) {
     }
 
     // @ts-ignore
-    const { role } = session.user;
-    // TODO: Add stricter permission checks for creation
+    const { role: currentUserRole, partyId: currentUserPartyId, slateId: currentUserSlateId } = session.user;
 
     try {
         const body = await request.json();
-        const { email, password, name, role: newRole, partyId, slateId } = body;
+        let { email, password, name, role: newRole, partyId, slateId } = body;
+
+        // RBAC Enforcement
+        if (currentUserRole !== 'SUPER_ADMIN' && currentUserRole !== 'ADMIN') {
+            if (currentUserRole === 'DIRIGENTE') {
+                if (['SUPER_ADMIN', 'ADMIN', 'DIRIGENTE'].includes(newRole)) {
+                    return NextResponse.json({ error: 'Forbidden: Cannot create administrative roles' }, { status: 403 });
+                }
+                // Force Party ID
+                partyId = currentUserPartyId;
+            } else if (currentUserRole === 'LIDER_CHAPA') {
+                if (newRole !== 'CANDIDATO') {
+                    return NextResponse.json({ error: 'Forbidden: Can only create Candidates' }, { status: 403 });
+                }
+                // Force Party and Slate IDs
+                partyId = currentUserPartyId;
+                slateId = currentUserSlateId;
+            } else {
+                return NextResponse.json({ error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+            }
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 

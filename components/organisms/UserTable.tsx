@@ -1,18 +1,16 @@
 import React from 'react';
 import { UserRow } from '../molecules/UserRow';
-import { User } from '@prisma/client';
+import { UserWithRelations } from '@/services/userService';
 
-interface UserWithRelations extends User {
-    party?: { code: string };
-    slate?: { name: string };
-}
+// interface UserWithRelations removed
 
 interface UserTableProps {
     users: UserWithRelations[];
     isLoading?: boolean;
+    onEdit: (user: UserWithRelations) => void;
 }
 
-export const UserTable: React.FC<UserTableProps> = ({ users, isLoading }) => {
+export const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit }) => {
     if (isLoading) {
         return <div className="p-4 text-center text-gray-500">Carregando usuários...</div>;
     }
@@ -48,7 +46,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, isLoading }) => {
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
                                 {users.map((user) => (
-                                    <UserRow key={user.id} user={user} />
+                                    <UserRow key={user.id} user={user} onEdit={onEdit} />
                                 ))}
                             </tbody>
                         </table>

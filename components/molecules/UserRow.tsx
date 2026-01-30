@@ -1,13 +1,7 @@
 import React from 'react';
 import { Badge } from '../atoms/Badge';
 import { Button } from '../atoms/Button';
-import { User } from '@prisma/client'; // Importing types directly or define custom interface
-
-// Extended User type to include relations if needed, or just use any/interface
-interface UserWithRelations extends User {
-    party?: { code: string };
-    slate?: { name: string };
-}
+import { UserWithRelations } from '@/services/userService';
 
 interface UserRowProps {
     user: UserWithRelations;

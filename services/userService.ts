@@ -1,6 +1,11 @@
 import api from './api';
 import { User } from '@prisma/client';
 
+export interface UserWithRelations extends User {
+    party?: { code: string; name: string } | null;
+    slate?: { name: string } | null;
+}
+
 export interface CreateUserDTO {
     name: string;
     email: string;
@@ -12,7 +17,7 @@ export interface CreateUserDTO {
 
 export const userService = {
     getAll: async () => {
-        const response = await api.get<User[]>('/users');
+        const response = await api.get<UserWithRelations[]>('/users');
         return response.data;
     },
     create: async (data: CreateUserDTO) => {
@@ -20,7 +25,7 @@ export const userService = {
         return response.data;
     },
     update: async (id: string, data: Partial<CreateUserDTO>) => {
-        const response = await api.put<User>(`/users/${id}`, data); // Need to implement PUT route later
+        const response = await api.put<User>(`/users/${id}`, data);
         return response.data;
     }
 };
