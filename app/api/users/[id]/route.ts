@@ -3,13 +3,13 @@ import { prisma } from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await auth();
     if (!session?.user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     // @ts-ignore
     const { role: currentUserRole, partyId: currentUserPartyId, slateId: currentUserSlateId } = session.user;
 
