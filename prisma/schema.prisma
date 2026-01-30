@@ -1,0 +1,61 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_URI")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  DIRIGENTE
+  LIDER_CHAPA
+  CANDIDATO
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String    @unique
+  password      String?
+  role          Role      @default(CANDIDATO)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relações Hierárquicas
+  partyId       String?   @db.ObjectId
+  party         Party?    @relation(fields: [partyId], references: [id])
+  
+  slateId       String?   @db.ObjectId
+  slate         Slate?    @relation(fields: [slateId], references: [id])
+  
+  candidateProfile CandidateProfile?
+}
+
+model Party {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  code      String   @unique
+  image     String?
+  users     User[]
+  slates    Slate[]
+}
+
+model Slate {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  partyId   String   @db.ObjectId
+  party     Party    @relation(fields: [partyId], references: [id])
+  users     User[]
+}
+
+model CandidateProfile {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  bio       String?
+  notes     String?
+}
