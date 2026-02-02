@@ -26,23 +26,27 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                     if (parsedCredentials.success) {
                         const { email, password } = parsedCredentials.data;
+
+                        // --- DEBUG BYPASS: Test if Auth works without DB ---
+                        if (email === 'admin@politirank.com' && password === '123456') {
+                            return {
+                                id: 'mock-super-admin',
+                                name: 'Super Admin',
+                                email: 'admin@politirank.com',
+                                role: 'SUPER_ADMIN',
+                                partyId: null,
+                                slateId: null
+                            };
+                        }
+                        // ----------------------------------------------------
+
                         const user = await prisma.user.findUnique({ where: { email } });
 
-                        if (!user) {
-                            console.log(`User not found: ${email}`);
-                            return null;
-                        }
-                        if (!user.password) {
-                            console.log(`User has no password: ${email}`);
-                            return null;
-                        }
+                        if (!user) return null;
+                        if (!user.password) return null;
 
                         const passwordsMatch = await bcrypt.compare(password, user.password);
                         if (passwordsMatch) return user;
-
-                        console.log(`Invalid password for: ${email}`);
-                    } else {
-                        console.log('Invalid zod schema');
                     }
                     return null;
                 } catch (error) {
