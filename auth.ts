@@ -10,7 +10,7 @@ import { z } from 'zod';
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
     ...authConfig,
-    adapter: PrismaAdapter(prisma),
+    // adapter: PrismaAdapter(prisma), // Not needed for Credentials/JWT and avoids initialization issues
     providers: [
         Credentials({
             name: 'Credentials',
