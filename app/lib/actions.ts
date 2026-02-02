@@ -19,7 +19,7 @@ export async function authenticate(
                 default:
                     console.error('AuthError:', error);
                     // DEBUG: Returning actual error to UI
-                    return `Error: ${error.type} - ${error.message}`;
+                    return `Error: ${error.type} - ${error.message} - Cause: ${error.cause ? JSON.stringify(error.cause) : 'N/A'}`;
             }
         }
         console.error('Login action failed:', error);
