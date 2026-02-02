@@ -19,10 +19,10 @@ export async function authenticate(
                 case 'CredentialsSignin':
                     return 'Credenciais inválidas.';
                 default:
-                    return 'Erro ao tentar entrar. Verifique suas credenciais e tente novamente.';
+                    return 'Erro ao tentar entrar. Tente novamente.';
             }
         }
-        console.error('Login action failed:', error);
-        return 'Erro inesperado. Tente novamente mais tarde.';
+        // CRITICAL FIX: Rethrow non-AuthErrors (like NEXT_REDIRECT)
+        throw error;
     }
 }
