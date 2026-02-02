@@ -34,6 +34,7 @@ export async function GET(request: Request) {
         });
         return NextResponse.json(users);
     } catch (error) {
+        console.error('DATABASE ERROR:', error); // DEBUG: Show why DB is failing
         return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 }

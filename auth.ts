@@ -27,19 +27,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     if (parsedCredentials.success) {
                         const { email, password } = parsedCredentials.data;
 
-                        // --- DEBUG BYPASS: Test if Auth works without DB ---
-                        if (email === 'admin@politirank.com' && password === '123456') {
-                            return {
-                                id: 'mock-super-admin',
-                                name: 'Super Admin',
-                                email: 'admin@politirank.com',
-                                role: 'SUPER_ADMIN',
-                                partyId: null,
-                                slateId: null
-                            };
-                        }
-                        // ----------------------------------------------------
-
                         const user = await prisma.user.findUnique({ where: { email } });
 
                         if (!user) return null;
