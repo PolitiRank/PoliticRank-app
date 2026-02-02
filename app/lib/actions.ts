@@ -16,14 +16,14 @@ export async function authenticate(
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
-                case 'CredentialsSignin':
-                    return 'Invalid credentials.';
                 default:
                     console.error('AuthError:', error);
-                    return 'Something went wrong.';
+                    // DEBUG: Returning actual error to UI
+                    return `Error: ${error.type} - ${error.message}`;
             }
         }
         console.error('Login action failed:', error);
-        throw error;
+        // Throwing text to see it in UI if possible, or return it
+        return `Unexpected Error: ${error instanceof Error ? error.message : String(error)}`;
     }
 }

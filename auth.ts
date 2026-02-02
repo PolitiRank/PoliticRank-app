@@ -19,23 +19,36 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials) {
-                const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
-                    .safeParse(credentials);
+                try {
+                    const parsedCredentials = z
+                        .object({ email: z.string().email(), password: z.string().min(6) })
+                        .safeParse(credentials);
 
-                if (parsedCredentials.success) {
-                    const { email, password } = parsedCredentials.data;
-                    const user = await prisma.user.findUnique({ where: { email } });
+                    if (parsedCredentials.success) {
+                        const { email, password } = parsedCredentials.data;
+                        const user = await prisma.user.findUnique({ where: { email } });
 
-                    if (!user) return null;
-                    if (!user.password) return null; // User might have signed up via OAuth (if enabled later)
+                        if (!user) {
+                            console.log(`User not found: ${email}`);
+                            return null;
+                        }
+                        if (!user.password) {
+                            console.log(`User has no password: ${email}`);
+                            return null;
+                        }
 
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
-                    if (passwordsMatch) return user;
+                        const passwordsMatch = await bcrypt.compare(password, user.password);
+                        if (passwordsMatch) return user;
+
+                        console.log(`Invalid password for: ${email}`);
+                    } else {
+                        console.log('Invalid zod schema');
+                    }
+                    return null;
+                } catch (error) {
+                    console.error('Authorize Error:', error);
+                    throw new Error(error instanceof Error ? error.message : String(error));
                 }
-
-                console.log('Invalid credentials');
-                return null;
             },
         }),
     ],
