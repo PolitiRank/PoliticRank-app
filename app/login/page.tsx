@@ -7,13 +7,26 @@ import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
     const [errorMessage, dispatch] = useFormState(authenticate, undefined);
-    const router = useRouter();
 
     useEffect(() => {
         if (errorMessage === 'SUCCESS') {
-            router.push('/dashboard');
+            // Force hard reload to ensure session cookies are picked up
+            window.location.href = '/dashboard';
         }
-    }, [errorMessage, router]);
+    }, [errorMessage]);
+
+    // Success State - Show loading screen while redirecting
+    if (errorMessage === 'SUCCESS') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-green-50">
+                <div className="p-8 bg-white rounded-lg shadow-xl text-center">
+                    <h2 className="text-2xl font-bold text-green-600 mb-4">Login Realizado!</h2>
+                    <p className="text-gray-600">Redirecionando para o painel...</p>
+                    <div className="mt-4 w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -57,10 +70,15 @@ export default function LoginPage() {
 
                     <LoginButton />
 
-                    <div className="flex flex-col space-y-2 h-8 items-end">
+                    <div className="flex flex-col space-y-2 mt-4">
+                        {/* Always show feedback, even if just to say 'Pending' */}
                         {errorMessage && errorMessage !== 'SUCCESS' && (
-                            <p className="text-sm text-red-500">{errorMessage}</p>
+                            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+                                <strong>Erro:</strong> {errorMessage}
+                            </div>
                         )}
+                        {/* Debug Info - Remove in final prod */}
+                        {/* <p className="text-xs text-gray-400 text-center">Status: {errorMessage || 'Aguardando ação...'}</p> */}
                     </div>
                 </form>
             </div>

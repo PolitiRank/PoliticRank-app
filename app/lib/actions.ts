@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 export async function authenticate(
     prevState: string | undefined,
     formData: FormData,
-) {
+): Promise<string | undefined> {
     try {
         await signIn('credentials', {
             email: formData.get('email'),
