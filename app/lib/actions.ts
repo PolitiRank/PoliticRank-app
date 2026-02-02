@@ -2,6 +2,7 @@
 
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import { redirect } from 'next/navigation';
 
 export async function authenticate(
     prevState: string | undefined,
@@ -11,8 +12,9 @@ export async function authenticate(
         await signIn('credentials', {
             email: formData.get('email'),
             password: formData.get('password'),
-            redirectTo: '/dashboard',
+            redirect: false,
         });
+        return 'SUCCESS';
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
@@ -23,6 +25,7 @@ export async function authenticate(
             }
         }
         // CRITICAL FIX: Rethrow non-AuthErrors (like NEXT_REDIRECT)
-        throw error;
+        // throw error; // No longer needed as we use redirect: false
+        return 'Erro inesperado. Tente novamente mais tarde.';
     }
 }

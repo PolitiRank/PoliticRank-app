@@ -1,11 +1,19 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import { authenticate } from '@/app/lib/actions'; // We need to create this action
-import { useState } from 'react';
+import { authenticate } from '@/app/lib/actions';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
     const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (errorMessage === 'SUCCESS') {
+            router.push('/dashboard');
+        }
+    }, [errorMessage, router]);
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -50,7 +58,7 @@ export default function LoginPage() {
                     <LoginButton />
 
                     <div className="flex flex-col space-y-2 h-8 items-end">
-                        {errorMessage && (
+                        {errorMessage && errorMessage !== 'SUCCESS' && (
                             <p className="text-sm text-red-500">{errorMessage}</p>
                         )}
                     </div>
