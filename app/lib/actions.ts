@@ -18,12 +18,12 @@ export async function authenticate(
             switch (error.type) {
                 default:
                     console.error('AuthError:', error);
-                    // DEBUG: Returning actual error to UI
-                    return `Error: ${error.type} - ${error.message} - Cause: ${error.cause ? JSON.stringify(error.cause) : 'N/A'}`;
+                    const cause = error.cause as any;
+                    const causeMessage = cause?.message || String(cause || 'Unknown Cause');
+                    return `Erro de Login: ${causeMessage}`;
             }
         }
         console.error('Login action failed:', error);
-        // Throwing text to see it in UI if possible, or return it
-        return `Unexpected Error: ${error instanceof Error ? error.message : String(error)}`;
+        return 'Erro inesperado ao tentar entrar. Tente novamente.';
     }
 }
