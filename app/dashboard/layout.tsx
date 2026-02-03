@@ -1,6 +1,9 @@
 import { auth, signOut } from '@/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuGroup } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { User, LogOut } from 'lucide-react';
 
 export default async function DashboardLayout({
     children,
@@ -51,18 +54,53 @@ export default async function DashboardLayout({
                             </div>
                         </div>
                         <div className="flex items-center space-x-4">
-                            <div className="text-sm text-gray-700">
-                                <span className="font-semibold">{session.user.name}</span>
-                                <span className="ml-2 text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded-full">{userRole}</span>
+                            <div className="flex items-center gap-3">
+                                <div className="text-right hidden sm:block">
+                                    <p className="text-sm font-medium text-gray-900">{session.user.name}</p>
+                                    <p className="text-xs text-gray-500 capitalize">{userRole?.toLowerCase() || 'Usuário'}</p>
+                                </div>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="relative h-10 w-10 rounded-full bg-gray-100 p-0 hover:bg-gray-200">
+                                            <div className="flex h-full w-full items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold border border-blue-200">
+                                                {session.user.name?.[0]?.toUpperCase() || 'U'}
+                                            </div>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                                        <DropdownMenuLabel className="font-normal">
+                                            <div className="flex flex-col space-y-1">
+                                                <p className="text-sm font-medium leading-none">{session.user.name}</p>
+                                                <p className="text-xs leading-none text-muted-foreground text-gray-500">
+                                                    {session.user.email}
+                                                </p>
+                                            </div>
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuGroup>
+                                            <DropdownMenuItem>
+                                                <User className="mr-2 h-4 w-4" />
+                                                <span>Perfil do Administrador</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuGroup>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <form
+                                                action={async () => {
+                                                    'use server';
+                                                    await signOut();
+                                                }}
+                                                className="w-full cursor-pointer"
+                                            >
+                                                <button className="flex w-full items-center text-red-600 cursor-pointer">
+                                                    <LogOut className="mr-2 h-4 w-4" />
+                                                    <span>Sair</span>
+                                                </button>
+                                            </form>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
-                            <form
-                                action={async () => {
-                                    'use server';
-                                    await signOut();
-                                }}
-                            >
-                                <button className="text-sm text-red-600 hover:text-red-800">Sair</button>
-                            </form>
                         </div>
                     </div>
                 </div>

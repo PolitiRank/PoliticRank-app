@@ -46,7 +46,7 @@ export default function UsersPage() {
                         Gerencie os usuários do sistema.
                     </p>
                 </div>
-                <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+                <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none cursor-pointer">
                     <Button onClick={handleCreate}>Adicionar Usuário</Button>
                 </div>
             </div>
