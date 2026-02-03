@@ -17,6 +17,11 @@ export default async function CandidateSelectionPage() {
     // @ts-ignore
     const slateId = session.user.slateId;
 
+    // SECURITY: Candidates cannot access this list
+    if (userRole === 'CANDIDATO') {
+        redirect('/dashboard');
+    }
+
     const candidates = await fetchCandidates(userRole, partyId, slateId);
 
     return (
