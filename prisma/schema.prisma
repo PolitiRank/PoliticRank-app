@@ -57,6 +57,40 @@ model CandidateProfile {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @unique @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
-  bio       String?
-  notes     String?
+  bio            String?
+  notes          String?
+  politiScore    Int             @default(0)
+  
+  socialProfiles SocialProfile[]
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  TWITTER
+  LINKEDIN
+  YOUTUBE
+}
+
+model SocialProfile {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  candidateId String   @db.ObjectId
+  candidate   CandidateProfile @relation(fields: [candidateId], references: [id])
+  
+  platform    SocialPlatform
+  handle      String
+  url         String?
+  
+  // Standardized Metrics (Manual or API)
+  followers   Int      @default(0)
+  following   Int      @default(0)
+  postsCount  Int      @default(0)
+  avgLikes    Float    @default(0.0)
+  engagement  Float    @default(0.0)
+  
+  // Flexible storage for API specific data
+  rawApiData  Json?
+  
+  lastUpdate  DateTime @default(now())
 }

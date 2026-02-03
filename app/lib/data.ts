@@ -1,39 +1,46 @@
-'use server';
+import { prisma } from '@/app/lib/prisma';
+import { unstable_noStore as noStore } from 'next/cache';
 
-import { auth } from '@/auth';
-import { prisma } from '@/app/lib/prisma'; // Need to ensure single instance
-import { Prisma } from '@prisma/client';
+export async function fetchCandidates(userRole: string, partyId?: string, slateId?: string) {
+    noStore(); // Disable caching for real-time updates
 
-export async function fetchUsers() {
-    const session = await auth();
-    if (!session?.user) throw new Error('Unauthorized');
+    try {
+        let whereClause: any = {
+            role: 'CANDIDATO' // We are looking for users who are candidates
+        };
 
-    // @ts-ignore
-    const { role, partyId, slateId } = session.user;
+        // Filter based on hierarchy
+        if (userRole === 'DIRIGENTE' && partyId) {
+            whereClause.partyId = partyId;
+        } else if (userRole === 'LIDER_CHAPA' && slateId) {
+            whereClause.slateId = slateId;
+        } else if (userRole === 'SUPER_ADMIN' || userRole === 'ADMIN') {
+            // Admins see everyone
+        } else {
+            // Candidates see only themselves (or empty if unauthorized to see list)
+            // Ideally candidates shouldn't access the full list page, but just in case:
+            return [];
+        }
 
-    const where: Prisma.UserWhereInput = {};
+        const candidates = await prisma.user.findMany({
+            where: whereClause,
+            include: {
+                party: true,
+                slate: true,
+                candidateProfile: {
+                    include: {
+                        socialProfiles: true // Option B: Include the social profiles
+                    }
+                }
+            },
+            orderBy: {
+                name: 'asc'
+            }
+        });
 
-    if (role === 'SUPER_ADMIN' || role === 'ADMIN') {
-        // No filter, see all
-    } else if (role === 'DIRIGENTE') {
-        if (!partyId) throw new Error('Party ID missing for Dirigente');
-        where.partyId = partyId;
-    } else if (role === 'LIDER_CHAPA') {
-        if (!slateId) throw new Error('Slate ID missing for Lider');
-        where.slateId = slateId;
-    } else {
-        // Candidates or others can only see themselves (or nothing on this list)
-        where.id = session.user.id;
+        return candidates;
+    } catch (error) {
+        console.error('Database Error:', error);
+        throw new Error('Failed to fetch candidates data.');
     }
-
-    const users = await prisma.user.findMany({
-        where,
-        include: {
-            party: true,
-            slate: true,
-        },
-        orderBy: { createdAt: 'desc' },
-    });
-
-    return users;
 }
