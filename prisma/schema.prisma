@@ -61,6 +61,23 @@ model CandidateProfile {
   notes          String?
   politiScore    Int             @default(0)
   
+  // Social Metrics
+  instagramFollowers Int?   @default(0)
+  instagramMentions  Int?   @default(0)
+  instagramComments  Int?   @default(0)
+  
+  facebookFollowers  Int?   @default(0)
+  facebookMentions   Int?   @default(0)
+  facebookComments   Int?   @default(0)
+  
+  tiktokFollowers    Int?   @default(0)
+  tiktokMentions     Int?   @default(0)
+  tiktokComments     Int?   @default(0)
+  
+  whatsappMessages   Int?   @default(0)
+  
+  lastMetricUpdate   DateTime?
+  
   socialProfiles SocialProfile[]
 }
 

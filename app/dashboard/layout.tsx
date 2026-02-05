@@ -22,6 +22,7 @@ export default async function DashboardLayout({
     const navigation = [
         { name: 'Visão Geral', href: '/dashboard', roles: ['ALL'] },
         { name: 'Usuários', href: '/dashboard/users', roles: ['SUPER_ADMIN', 'ADMIN', 'DIRIGENTE'] },
+        { name: 'Entrada de Dados', href: '/dashboard/to-do', roles: ['SUPER_ADMIN', 'ADMIN'] },
         // { name: 'Candidatos', href: '/dashboard/candidates', roles: ['SUPER_ADMIN', 'ADMIN', 'DIRIGENTE', 'LIDER_CHAPA'] },
     ];
 

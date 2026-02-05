@@ -3,6 +3,8 @@
 import { useState } from "react";
 // @ts-ignore
 import { useFormState } from "react-dom";
+import { useEffect } from "react";
+import Swal from 'sweetalert2';
 import { createCandidate } from "@/app/lib/actions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +13,20 @@ import { Instagram, Facebook, Ticket } from "lucide-react";
 
 export function AddCandidateModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const [state, formAction] = useFormState(createCandidate, null);
+
+    useEffect(() => {
+        if (state?.success) {
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Os dados do seu candidato vão ser adicionados em até 24 horas',
+                icon: 'success',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#2563eb' // blue-600
+            }).then(() => {
+                onClose();
+            });
+        }
+    }, [state, onClose]);
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

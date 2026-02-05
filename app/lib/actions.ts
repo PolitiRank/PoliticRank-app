@@ -58,7 +58,7 @@ export async function createCandidate(prevState: any, formData: FormData) {
         const validatedFields = CreateCandidateSchema.safeParse(rawData);
 
         if (!validatedFields.success) {
-            return { message: 'Dados inválidos. Verifique os campos.' };
+            return { message: 'Dados inválidos. Verifique os campos.', success: false };
         }
 
         const { name, email, instagram, facebook, tiktok, notes } = validatedFields.data;
@@ -69,7 +69,7 @@ export async function createCandidate(prevState: any, formData: FormData) {
         });
 
         if (existingUser) {
-            return { message: 'Este email já está cadastrado no sistema.' };
+            return { message: 'Este email já está cadastrado no sistema.', success: false };
         }
 
         const hashedPassword = await bcrypt.hash('Mudar123!', 10);
@@ -128,11 +128,11 @@ export async function createCandidate(prevState: any, formData: FormData) {
         });
 
         revalidatePath('/dashboard/candidates');
-        return { message: 'Candidato criado com sucesso!' };
+        return { message: 'Candidato criado com sucesso!', success: true };
 
     } catch (error) {
         console.error('Server Action Error:', error);
-        return { message: 'Erro ao criar candidato. Tente novamente.' };
+        return { message: 'Erro ao criar candidato. Tente novamente.', success: false };
     }
 }
 
